@@ -1,11 +1,24 @@
 Package: chartr
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Charting economic variables
 Version: 0.1
 Date: 2016-03-14
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: Joshua Packwood, Bryan Chen
+Maintainer: Joshua Packwood, Bryan Chen
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Depends:
+  quantmod,
+  xts,
+  ggplot2,
+  grid,
+  hash,
+  gridExtra,
+  zoo,
+  scales,
+  data.table,
+  lubridate,
+  plyr,
+  reshape2
+License: GPL v.2
 LazyData: TRUE
 RoxygenNote: 5.0.1.9000
