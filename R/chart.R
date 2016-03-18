@@ -60,6 +60,50 @@ GetMin <- function (RANGE) {
 }
 
 #'
+#'@param SYMBOL
+#'@return data frame
+#'@export
+#'
+Summarize <- function(SYMBOL) {
+  delt_data <- data.frame(c(Delt(xts(Cl(SYMBOL))[FormatDelt(ten_yr)])))     # Delt to retrieve % changes limited to one_mo
+  delt_data$date = as.Date(rownames(delt_data))                       # Retreive date attribute in delt row
+
+  h <- hash()
+
+  h$day <- list(percent=percent(tail(delt_data[,1], 1)),
+                price=GetPriceChange(Sys.Date(), one_day, gld_data))
+
+  h$wtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(Eopw('Fri'))], na.rm = TRUE)),
+                price=GetPriceChange(Sys.Date(), Eopw('Fri'), gld_data))
+
+  h$week <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_wk)], na.rm = TRUE)),
+                 price=GetPriceChange(Sys.Date(), one_wk, gld_data))
+
+  h$mtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= Eopm(Sys.Date())], na.rm = TRUE)),
+                price=GetPriceChange(Sys.Date(), Eopm(Sys.Date()), gld_data))
+
+  h$month <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_mo)], na.rm = TRUE)),
+                  price=GetPriceChange(Sys.Date(), one_mo, gld_data))
+
+  h$qtr <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(three_mo)], na.rm = TRUE)),
+                price=GetPriceChange(Sys.Date(), three_mo, gld_data))
+
+  h$year <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_yr)], na.rm = TRUE)),
+                 price=GetPriceChange(Sys.Date(), one_yr, gld_data))
+
+  # Create summary data table
+  summary_data <- data.frame(
+    DAY=c(h[["day"]]$percent, h[["day"]]$price),
+    WTD=c(h[["wtd"]]$percent, h[["wtd"]]$price),
+    WEEK=c(h[["week"]]$percent, h[["week"]]$price),
+    MTD=c(h[["mtd"]]$percent, h[["mtd"]]$price),
+    MONTH=c(h[["month"]]$percent, h[["month"]]$price),
+    QTR=c(h[["qtr"]]$percent, h[["qtr"]]$price),
+    YEAR=c(h[["year"]]$percent, h[["year"]]$price)
+  )
+}
+
+#'
 #'
 #'
 SaveCharts <- function () {
