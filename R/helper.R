@@ -14,8 +14,8 @@ FormatDelt <- function(DATE) {
   return (formatted_date)
 }
 
-#' gets max in date range (i.e. one_mo, three_mo, etc)
-#' gld_data is the object data.frame(Cl(GLD))
+# gets max in date range (i.e. one_mo, three_mo, etc)
+# gld_data is the object data.frame(Cl(GLD))
 GetMax <- function (DATAFRAME, DATE) {
   return (max(DATAFRAME[DATAFRAME$date >= (DATE),1], na.rm=TRUE))
 }

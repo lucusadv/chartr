@@ -4,8 +4,8 @@ Title: Charting economic variables
 Version: 0.1
 Date: 2016-03-14
 Author: Joshua Packwood, Bryan Chen
-Maintainer: Joshua Packwood, Bryan Chen
-Description: More about what it does (maybe more than one line)
+Maintainer: Joshua Packwood <joshua.packwood@lucusadvisors.com>
+Description: chartr is a package for R aimed at making charts with detailed annotations of economic variables. chartr will largely consist of "wrapper" / "convenience" functions utilizing the functions from active R packages such as magrittr, quantmod, and ggplot2.
 Imports:
   quantmod,
   xts,

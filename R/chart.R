@@ -1,8 +1,31 @@
+#' @import quantmod
+#' @import xts
+#' @import ggplot2
+#' @import grid
+#' @import hash
+#' @import gridExtra
+#' @import zoo
+#' @import scales
+#' @import data.table
+#' @import lubridate
+#' @import plyr
+#' @import reshape2
+
 label <- format(Sys.Date(), format = "%d-%b-%Y")
 source_path <- paste(getwd(), "/R/helper.R", sep = "")
 output_path <- paste(getwd(), "/demo/", label, ".pdf", sep = "")
-
 source(file = source_path, local = TRUE)
+
+# Get formatted date ranges for querying in quantmod Delt
+ten_yr <- lubridate::add_with_rollback(Sys.Date(), years(-10))
+five_yr <- lubridate::add_with_rollback(Sys.Date(), years(-5))
+three_yr <- lubridate::add_with_rollback(Sys.Date(), years(-3))
+one_yr <- lubridate::add_with_rollback(Sys.Date(), years(-1))
+six_mo <- lubridate::add_with_rollback(Sys.Date(), months(-6))
+three_mo <- lubridate::add_with_rollback(Sys.Date(), months(-3))
+one_mo <- lubridate::add_with_rollback(Sys.Date(), months(-1))
+one_wk <- lubridate::add_with_rollback(Sys.Date(), weeks(-1))
+one_day <- lubridate::add_with_rollback(Sys.Date(), days(-1))
 
 #'
 #'@param SYMBOL: ticker
@@ -57,7 +80,7 @@ ChartBook <- function (SYMBOLS) {
   )
   theme_set(theme_bw(base_size = 5))
 
-  for (SYMBOL in c(SYMBOLS)) {
+  for (SYMBOL in SYMBOLS) {
     data_frame <- data.frame(Cl(SYMBOL))
     summary_data <- Summary(SYMBOL)
     summary_table <- tableGrob(summary_data,
