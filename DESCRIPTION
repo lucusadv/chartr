@@ -6,7 +6,7 @@ Date: 2016-03-14
 Author: Joshua Packwood, Bryan Chen
 Maintainer: Joshua Packwood, Bryan Chen
 Description: More about what it does (maybe more than one line)
-Depends:
+Imports:
   quantmod,
   xts,
   ggplot2,

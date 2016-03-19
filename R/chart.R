@@ -1,8 +1,12 @@
-source("helper.R")
+label <- format(Sys.Date(), format = "%d-%b-%Y")
+source_path <- paste(getwd(), "/R/helper.R", sep = "")
+output_path <- paste(getwd(), "/demo/", label, ".pdf", sep = "")
+
+source(file = source_path, local = TRUE)
 
 #'
-#'@param SYMBOL
-#'@return data frame
+#'@param SYMBOL: ticker
+#'@return summary_data: data frame
 #'@export
 #'
 Summary <- function(SYMBOL, max=ten_yr) {
@@ -11,6 +15,7 @@ Summary <- function(SYMBOL, max=ten_yr) {
   delt_data$date = as.Date(rownames(delt_data))
   # Delt to retrieve % changes limited to one_mo
   data_frame <- data.frame(Cl(SYMBOL))
+
   h <- hash()
   h$day <- list(percent=percent(tail(delt_data[,1], 1)),
                 price=GetPriceChange(Sys.Date(), one_day, data_frame))
@@ -39,7 +44,9 @@ Summary <- function(SYMBOL, max=ten_yr) {
 }
 
 #'
-#'@param SYMBOLS
+#'@param SYMBOLS: list of tickers
+#'@return null: generates pdf
+#'@export
 #'
 ChartBook <- function (SYMBOLS) {
   # Default theme for all tableGrobs
@@ -52,46 +59,49 @@ ChartBook <- function (SYMBOLS) {
 
   for (SYMBOL in c(SYMBOLS)) {
     data_frame <- data.frame(Cl(SYMBOL))
+    summary_data <- Summary(SYMBOL)
+    summary_table <- tableGrob(summary_data,
+                         theme = k_theme,
+                         rows = c("Percent Change", "Absolute Change")
+    )
     one_mo_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("1-Month") +
-      scale_y_continuous(limits = c(GetMin(one_mo), GetMax(one_mo))) +
+      scale_y_continuous(limits = c(GetMin(data_frame, one_mo), GetMax(data_frame, one_mo))) +
       scale_x_date(limits = c(one_mo, NA), date_labels = "%b %d", date_breaks = "1 week")
     three_mo_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("3-Month") +
-      scale_y_continuous(limits = c(GetMin(three_mo), GetMax(three_mo))) +
+      scale_y_continuous(limits = c(GetMin(data_frame, three_mo), GetMax(data_frame, three_mo))) +
       scale_x_date(limits = c(three_mo, NA), date_labels = "%b %d", date_breaks = "3 weeks")
     six_mo_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("6-Month") +
-      scale_y_continuous(limits = c(GetMin(six_mo), GetMax(six_mo))) +
+      scale_y_continuous(limits = c(GetMin(data_frame, six_mo), GetMax(data_frame, six_mo))) +
       scale_x_date(limits = c(six_mo, NA), date_labels = "%b", date_breaks = "1 month")
     one_yr_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("12-Month") +
-      scale_y_continuous(limits = c(GetMin(one_yr), GetMax(one_yr))) +
+      scale_y_continuous(limits = c(GetMin(data_frame, one_yr), GetMax(data_frame, one_yr))) +
       scale_x_date(limits = c(one_yr, NA), date_labels = "%b", date_breaks = "2 months")
     three_yr_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("3-Year") +
-      scale_y_continuous(limits = c(GetMin(three_yr), GetMax(three_yr))) +
+      scale_y_continuous(limits = c(GetMin(data_frame, three_yr), GetMax(data_frame, three_yr))) +
       scale_x_date(limits = c(three_yr, NA), date_labels = "%b %Y", date_breaks = "1 year")
     five_yr_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("5-Year") +
-      scale_y_continuous(limits = c(GetMin(five_yr), GetMax(five_yr))) +
+      scale_y_continuous(limits = c(GetMin(data_frame, five_yr), GetMax(data_frame, five_yr))) +
       scale_x_date(limits = c(five_yr, NA), date_labels = "%Y", date_breaks = "1 year")
     ten_yr_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("10-Year") +
-      scale_y_continuous(limits = c(GetMin(ten_yr), GetMax(ten_yr))) +
+      scale_y_continuous(limits = c(GetMin(data_frame, ten_yr), GetMax(data_frame, ten_yr))) +
       scale_x_date(limits = c(ten_yr, NA), date_labels = "%Y", date_breaks = "2 years")
     all_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("All Time") +
       scale_x_date(date_labels = "%Y", date_breaks = "5 years")
 
     # Export to pdf, file="/path/to/chart/book/directory"
-    label <- format(Sys.Date(), format = "%d-%b-%Y")
-    path <- paste("/home/bryan/R/ecocharts/chart\ book/", label, ".pdf", sep = "")
-    pdf(file=path, onefile=FALSE, paper="legal", width=0, height=0,
-        title="Gold Prices (FRED Series: GOLDPMGBD228NLBM)")
+    pdf(file = output_path, onefile = FALSE, paper = "letter", width = 0, height = 0,
+        title = format(SYMBOL))
     # suppress warnings of rows missing values
     # with summary: arrangeGrob(summary, one_mo_plot, heights=c(0.5,2))
-    suppressWarnings(grid.arrange(arrangeGrob(summary, one_mo_plot, heights=c(0.5, 2)),
+    suppressWarnings(grid.arrange(arrangeGrob(summary_table, one_mo_plot, heights=c(0.5, 2)),
                                   arrangeGrob(three_mo_plot, heights=c(2)),
                                   arrangeGrob(six_mo_plot, heights=c(2)),
                                   arrangeGrob(one_yr_plot, heights=c(2)),
@@ -99,9 +109,7 @@ ChartBook <- function (SYMBOLS) {
                                   arrangeGrob(five_yr_plot, heights=c(2)),
                                   arrangeGrob(ten_yr_plot, heights=c(2)),
                                   arrangeGrob(all_plot, heights=c(2)),
-                                  arrangeGrob(bonds_plot, heights=c(2)),
-                                  arrangeGrob(volatility_plot, heights=c(2)),
-                                  nrow=5, ncol=2))
+                                  nrow=4, ncol=2))
     dev.off()
   }
 }

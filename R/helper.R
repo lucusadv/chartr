@@ -1,11 +1,11 @@
 # Get end of previous week (Eopw)
-Eopw <- function(DAY) {
+Eopw <- function(DATE) {
   dates <- seq((Sys.Date()-7), (Sys.Date()-1), by="days")
-  return (dates[wday(dates, label = T)==DAY])
+  return (dates[wday(dates, label = T)==DATE])
 }
 # Get end of previous month (Eopm)
-Eopm <- function(DAY) {
-  return (as.Date(format(DAY, "%Y-%m-01")) - 1)
+Eopm <- function(DATE) {
+  return (as.Date(format(DATE, "%Y-%m-01")) - 1)
 }
 
 # formats the date for Delt operation
@@ -16,12 +16,12 @@ FormatDelt <- function(DATE) {
 
 #' gets max in date range (i.e. one_mo, three_mo, etc)
 #' gld_data is the object data.frame(Cl(GLD))
-GetMax <- function (DATE, DATAFRAME) {
+GetMax <- function (DATAFRAME, DATE) {
   return (max(DATAFRAME[DATAFRAME$date >= (DATE),1], na.rm=TRUE))
 }
 
 # gets min in date range
-GetMin <- function (DATE, DATAFRAME) {
+GetMin <- function (DATAFRAME, DATE) {
   return (min(DATAFRAME[DATAFRAME$date >= (DATE),1], na.rm=TRUE))
 }
 
@@ -48,14 +48,3 @@ GetPriceChange <- function(END, START, DATAFRAME) {
   price_change <- format(as.numeric(end_date - start_date), nsmall = 2)
   return (price_change)
 }
-
-# Get formatted date ranges for querying in quantmod Delt
-ten_yr <- lubridate::add_with_rollback(Sys.Date(), years(-10))
-five_yr <- lubridate::add_with_rollback(Sys.Date(), years(-5))
-three_yr <- lubridate::add_with_rollback(Sys.Date(), years(-3))
-one_yr <- lubridate::add_with_rollback(Sys.Date(), years(-1))
-six_mo <- lubridate::add_with_rollback(Sys.Date(), months(-6))
-three_mo <- lubridate::add_with_rollback(Sys.Date(), months(-3))
-one_mo <- lubridate::add_with_rollback(Sys.Date(), months(-1))
-one_wk <- lubridate::add_with_rollback(Sys.Date(), weeks(-1))
-one_day <- lubridate::add_with_rollback(Sys.Date(), days(-1))
