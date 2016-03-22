@@ -1,16 +1,3 @@
-#' @import quantmod
-#' @import xts
-#' @import ggplot2
-#' @import grid
-#' @import hash
-#' @import gridExtra
-#' @import zoo
-#' @import scales
-#' @import data.table
-#' @import lubridate
-#' @import plyr
-#' @import reshape2
-
 label <- format(Sys.Date(), format = "%d-%b-%Y")
 source_path <- paste(getwd(), "/R/helper.R", sep = "")
 output_path <- paste(getwd(), "/demo/", label, ".pdf", sep = "")
@@ -27,12 +14,13 @@ one_mo <- lubridate::add_with_rollback(Sys.Date(), months(-1))
 one_wk <- lubridate::add_with_rollback(Sys.Date(), weeks(-1))
 one_day <- lubridate::add_with_rollback(Sys.Date(), days(-1))
 
-#'
+#'Generates a summary matrix of percent and price changes
 #'@param SYMBOL: ticker
-#'@return summary_data: data frame
+#'@return summary_data: matrix of percent and price changes
 #'@export
 #'
 Summary <- function(SYMBOL, max=ten_yr) {
+  SYMBOL
   delt_data <- data.frame(c(Delt(xts(Cl(SYMBOL))[FormatDelt(ten_yr)])))
   # Retreive date attribute in delt row
   delt_data$date = as.Date(rownames(delt_data))
@@ -41,19 +29,19 @@ Summary <- function(SYMBOL, max=ten_yr) {
 
   h <- hash()
   h$day <- list(percent=percent(tail(delt_data[,1], 1)),
-                price=GetPriceChange(Sys.Date(), one_day, data_frame))
+                price=GetPriceChange(data_frame, Sys.Date(), one_day))
   h$wtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(Eopw('Fri'))], na.rm = TRUE)),
-                price=GetPriceChange(Sys.Date(), Eopw('Fri'), data_frame))
+                price=GetPriceChange(data_frame, Sys.Date(), Eopw('Fri')))
   h$week <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_wk)], na.rm = TRUE)),
-                 price=GetPriceChange(Sys.Date(), one_wk, data_frame))
+                 price=GetPriceChange(data_frame, Sys.Date(), one_wk))
   h$mtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= Eopm(Sys.Date())], na.rm = TRUE)),
-                price=GetPriceChange(Sys.Date(), Eopm(Sys.Date()), data_frame))
+                price=GetPriceChange(data_frame, Sys.Date(), Eopm(Sys.Date())))
   h$month <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_mo)], na.rm = TRUE)),
-                  price=GetPriceChange(Sys.Date(), one_mo, data_frame))
+                  price=GetPriceChange(data_frame, Sys.Date(), one_mo))
   h$qtr <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(three_mo)], na.rm = TRUE)),
-                price=GetPriceChange(Sys.Date(), three_mo, data_frame))
+                price=GetPriceChange(data_frame, Sys.Date(), three_mo))
   h$year <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_yr)], na.rm = TRUE)),
-                 price=GetPriceChange(Sys.Date(), one_yr, data_frame))
+                 price=GetPriceChange(data_frame, Sys.Date(), one_yr))
   summary_data <- data.frame(
     DAY=c(h[["day"]]$percent, h[["day"]]$price),
     WTD=c(h[["wtd"]]$percent, h[["wtd"]]$price),
@@ -66,7 +54,7 @@ Summary <- function(SYMBOL, max=ten_yr) {
   return (summary_data)
 }
 
-#'
+#'Generates paginated chart books of performance over time
 #'@param SYMBOLS: list of tickers
 #'@return null: generates pdf
 #'@export
@@ -81,6 +69,8 @@ ChartBook <- function (SYMBOLS) {
   theme_set(theme_bw(base_size = 5))
 
   for (SYMBOL in SYMBOLS) {
+    print("ChartBook: ")
+    print(SYMBOL)
     data_frame <- data.frame(Cl(SYMBOL))
     summary_data <- Summary(SYMBOL)
     summary_table <- tableGrob(summary_data,

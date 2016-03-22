@@ -14,25 +14,25 @@ FormatDelt <- function(DATE) {
   return (formatted_date)
 }
 
-# gets max in date range (i.e. one_mo, three_mo, etc)
-# gld_data is the object data.frame(Cl(GLD))
+# Gets max in data frame
 GetMax <- function (DATAFRAME, DATE) {
   return (max(DATAFRAME[DATAFRAME$date >= (DATE),1], na.rm=TRUE))
 }
 
-# gets min in date range
+# Gets min in date range
 GetMin <- function (DATAFRAME, DATE) {
   return (min(DATAFRAME[DATAFRAME$date >= (DATE),1], na.rm=TRUE))
 }
 
 #'
 #'Gets price change over period
-#'param START date format
-#'param END date format
-#'param DATAFRAME data frame over period
-#'returns price_change: difference in Cl over period
+#'@param DATAFRAME: data frame of prices
+#'@param START: date format
+#'@param END: date format
+#'@return price_change: difference in prices over period
+#'@export
 #'
-GetPriceChange <- function(END, START, DATAFRAME) {
+GetPriceChange <- function(DATAFRAME, END, START) {
   start_date <- DATAFRAME[DATAFRAME$date == START,1]
   end_date <- DATAFRAME[DATAFRAME$date == END,1]
   # if gold data at end_date returns numeric(0) i.e. at off hours, get data s.t. end_date = END-1, start_date = START-1

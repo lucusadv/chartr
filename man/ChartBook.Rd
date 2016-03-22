@@ -2,6 +2,7 @@
 % Please edit documentation in R/chart.R
 \name{ChartBook}
 \alias{ChartBook}
+\title{Generates paginated chart books of performance over time}
 \usage{
 ChartBook(SYMBOLS)
 }
@@ -10,5 +11,8 @@ ChartBook(SYMBOLS)
 }
 \value{
 null: generates pdf
+}
+\description{
+Generates paginated chart books of performance over time
 }
 

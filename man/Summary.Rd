@@ -2,6 +2,7 @@
 % Please edit documentation in R/chart.R
 \name{Summary}
 \alias{Summary}
+\title{Generates a summary matrix of percent and price changes}
 \usage{
 Summary(SYMBOL, max = ten_yr)
 }
@@ -9,6 +10,9 @@ Summary(SYMBOL, max = ten_yr)
 \item{SYMBOL:}{ticker}
 }
 \value{
-summary_data: data frame
+summary_data: matrix of percent and price changes
+}
+\description{
+Generates a summary matrix of percent and price changes
 }
 

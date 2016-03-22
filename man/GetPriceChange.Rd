@@ -2,19 +2,21 @@
 % Please edit documentation in R/helper.R
 \name{GetPriceChange}
 \alias{GetPriceChange}
-\title{Gets price change over period
-param START date format
-param END date format
-param DATAFRAME data frame over period
-returns price_change: difference in Cl over period}
+\title{Gets price change over period}
 \usage{
-GetPriceChange(END, START, DATAFRAME)
+GetPriceChange(DATAFRAME, END, START)
+}
+\arguments{
+\item{DATAFRAME:}{data frame of prices}
+
+\item{START:}{date format}
+
+\item{END:}{date format}
+}
+\value{
+price_change: difference in prices over period
 }
 \description{
 Gets price change over period
-param START date format
-param END date format
-param DATAFRAME data frame over period
-returns price_change: difference in Cl over period
 }
 
