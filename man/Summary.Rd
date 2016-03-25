@@ -7,7 +7,7 @@
 Summary(SYMBOL, max = ten_yr)
 }
 \arguments{
-\item{SYMBOL:}{ticker}
+\item{SYMBOL:}{string ticker name}
 }
 \value{
 summary_data: matrix of percent and price changes

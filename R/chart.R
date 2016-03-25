@@ -1,31 +1,20 @@
 label <- format(Sys.Date(), format = "%d-%b-%Y")
-source_path <- paste(getwd(), "/R/helper.R", sep = "")
+source_path <- paste(getwd(), "/R/source.R", sep = "")
 output_path <- paste(getwd(), "/demo/", label, ".pdf", sep = "")
 source(file = source_path, local = TRUE)
 
-# Get formatted date ranges for querying in quantmod Delt
-ten_yr <- lubridate::add_with_rollback(Sys.Date(), years(-10))
-five_yr <- lubridate::add_with_rollback(Sys.Date(), years(-5))
-three_yr <- lubridate::add_with_rollback(Sys.Date(), years(-3))
-one_yr <- lubridate::add_with_rollback(Sys.Date(), years(-1))
-six_mo <- lubridate::add_with_rollback(Sys.Date(), months(-6))
-three_mo <- lubridate::add_with_rollback(Sys.Date(), months(-3))
-one_mo <- lubridate::add_with_rollback(Sys.Date(), months(-1))
-one_wk <- lubridate::add_with_rollback(Sys.Date(), weeks(-1))
-one_day <- lubridate::add_with_rollback(Sys.Date(), days(-1))
-
 #'Generates a summary matrix of percent and price changes
-#'@param SYMBOL: ticker
+#'@param SYMBOL: string ticker name
 #'@return summary_data: matrix of percent and price changes
 #'@export
 #'
 Summary <- function(SYMBOL, max=ten_yr) {
-  SYMBOL
-  delt_data <- data.frame(c(Delt(xts(Cl(SYMBOL))[FormatDelt(ten_yr)])))
+  symbol <- suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl"))
+  delt_data <- data.frame(c(Delt(xts(Cl(symbol))[FormatDelt(ten_yr)])))
   # Retreive date attribute in delt row
   delt_data$date = as.Date(rownames(delt_data))
   # Delt to retrieve % changes limited to one_mo
-  data_frame <- data.frame(Cl(SYMBOL))
+  data_frame <- data.frame(Cl(symbol))
 
   h <- hash()
   h$day <- list(percent=percent(tail(delt_data[,1], 1)),
@@ -54,8 +43,9 @@ Summary <- function(SYMBOL, max=ten_yr) {
   return (summary_data)
 }
 
+#'
 #'Generates paginated chart books of performance over time
-#'@param SYMBOLS: list of tickers
+#'@param SYMBOLS: list of strings of ticker names
 #'@return null: generates pdf
 #'@export
 #'
@@ -69,8 +59,8 @@ ChartBook <- function (SYMBOLS) {
   theme_set(theme_bw(base_size = 5))
 
   for (SYMBOL in SYMBOLS) {
-    print("ChartBook: ")
-    print(SYMBOL)
+    SYMBOL
+    suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl"))
     data_frame <- data.frame(Cl(SYMBOL))
     summary_data <- Summary(SYMBOL)
     summary_table <- tableGrob(summary_data,

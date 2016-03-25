@@ -7,7 +7,7 @@
 ChartBook(SYMBOLS)
 }
 \arguments{
-\item{SYMBOLS:}{list of tickers}
+\item{SYMBOLS:}{list of strings of ticker names}
 }
 \value{
 null: generates pdf

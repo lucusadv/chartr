@@ -1,3 +1,16 @@
+library(lubridate)
+
+# Get formatted date ranges for querying in quantmod Delt
+ten_yr <- lubridate::add_with_rollback(Sys.Date(), years(-10))
+five_yr <- lubridate::add_with_rollback(Sys.Date(), years(-5))
+three_yr <- lubridate::add_with_rollback(Sys.Date(), years(-3))
+one_yr <- lubridate::add_with_rollback(Sys.Date(), years(-1))
+six_mo <- lubridate::add_with_rollback(Sys.Date(), months(-6))
+three_mo <- lubridate::add_with_rollback(Sys.Date(), months(-3))
+one_mo <- lubridate::add_with_rollback(Sys.Date(), months(-1))
+one_wk <- lubridate::add_with_rollback(Sys.Date(), weeks(-1))
+one_day <- lubridate::add_with_rollback(Sys.Date(), days(-1))
+
 # Get end of previous week (Eopw)
 Eopw <- function(DATE) {
   dates <- seq((Sys.Date()-7), (Sys.Date()-1), by="days")
