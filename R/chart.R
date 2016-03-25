@@ -59,8 +59,7 @@ ChartBook <- function (SYMBOLS) {
     rowhead = list(fg_params=list(cex = 0.4))
   )
   theme_set(theme_bw(base_size = 5))
-  # Error in read.table(file = file, header = header, sep = sep, quote = quote,  :
-  # no lines available in input
+  # Error in read.table(file = file, header = header, sep = sep, quote = quote,  :no lines available in input
   # create list of xts objects by applying getSymbols on each ticker
   xts_objects <- lapply(SYMBOLS, function(SYMBOL) {
     suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
