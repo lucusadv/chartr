@@ -1,4 +1,4 @@
-library(lubridate)
+require(lubridate)
 
 # Get formatted date ranges for querying in quantmod Delt
 ten_yr <- lubridate::add_with_rollback(Sys.Date(), years(-10))

@@ -58,14 +58,21 @@ ChartBook <- function (SYMBOLS) {
   )
   theme_set(theme_bw(base_size = 5))
 
-  for (SYMBOL in SYMBOLS) {
-    SYMBOL
-    suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl"))
-    data_frame <- data.frame(Cl(SYMBOL))
-    summary_data <- Summary(SYMBOL)
+  # create list of xts objects by applying getSymbols on each ticker
+  xts_objects <- lapply(SYMBOLS, function(SYMBOL) {
+    suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
+  })
+  names(xts_objects) <- SYMBOLS
+
+  lapply(xts_objects, function(xts_object) {
+    # ticker symbol, etc. GLD, is names of xts object
+    symbol <- names(xts_object)
+    data_frame <- data.frame(Cl(xts_object))
+    # param for summary_data is ticker
+    summary_data <- Summary(symbol)
     summary_table <- tableGrob(summary_data,
-                         theme = k_theme,
-                         rows = c("Percent Change", "Absolute Change")
+                               theme = k_theme,
+                               rows = c("Percent Change", "Absolute Change")
     )
     one_mo_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("1-Month") +
@@ -101,7 +108,7 @@ ChartBook <- function (SYMBOLS) {
 
     # Export to pdf, file="/path/to/chart/book/directory"
     pdf(file = output_path, onefile = FALSE, paper = "letter", width = 0, height = 0,
-        title = format(SYMBOL))
+        title = format(symbol))
     # suppress warnings of rows missing values
     # with summary: arrangeGrob(summary, one_mo_plot, heights=c(0.5,2))
     suppressWarnings(grid.arrange(arrangeGrob(summary_table, one_mo_plot, heights=c(0.5, 2)),
@@ -114,5 +121,5 @@ ChartBook <- function (SYMBOLS) {
                                   arrangeGrob(all_plot, heights=c(2)),
                                   nrow=4, ncol=2))
     dev.off()
-  }
+  })
 }
