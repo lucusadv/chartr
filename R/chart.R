@@ -9,12 +9,14 @@ source(file = source_path, local = TRUE)
 #'@export
 #'
 Summary <- function(SYMBOL, max=ten_yr) {
-  symbol <- suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl"))
-  delt_data <- data.frame(c(Delt(xts(Cl(symbol))[FormatDelt(ten_yr)])))
+  xts_object <- lapply(SYMBOL, function(SYMBOL) {
+    suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
+  })
+  delt_data <- data.frame(c(Delt(xts(Cl(xts_object))[FormatDelt(ten_yr)])))
   # Retreive date attribute in delt row
   delt_data$date = as.Date(rownames(delt_data))
   # Delt to retrieve % changes limited to one_mo
-  data_frame <- data.frame(Cl(symbol))
+  data_frame <- data.frame(Cl(xts_object))
 
   h <- hash()
   h$day <- list(percent=percent(tail(delt_data[,1], 1)),
@@ -57,7 +59,8 @@ ChartBook <- function (SYMBOLS) {
     rowhead = list(fg_params=list(cex = 0.4))
   )
   theme_set(theme_bw(base_size = 5))
-
+  # Error in read.table(file = file, header = header, sep = sep, quote = quote,  :
+  # no lines available in input
   # create list of xts objects by applying getSymbols on each ticker
   xts_objects <- lapply(SYMBOLS, function(SYMBOL) {
     suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
