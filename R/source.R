@@ -1,4 +1,15 @@
-require(lubridate)
+#'@import quantmod
+#'@import xts
+#'@import ggplot2
+#'@import grid
+#'@import hash
+#'@import gridExtra
+#'@import zoo
+#'@import scales
+#'@import data.table
+#'@import lubridate
+#'@import plyr
+#'@import reshape2
 
 # Get formatted date ranges for querying in quantmod Delt
 ten_yr <- lubridate::add_with_rollback(Sys.Date(), years(-10))

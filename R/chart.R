@@ -9,9 +9,7 @@ source(file = source_path, local = TRUE)
 #'@export
 #'
 Summary <- function(SYMBOL, max=ten_yr) {
-  xts_object <- lapply(SYMBOL, function(SYMBOL) {
-    suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
-  })
+  xts_object <- suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
   delt_data <- data.frame(c(Delt(xts(Cl(xts_object))[FormatDelt(ten_yr)])))
   # Retreive date attribute in delt row
   delt_data$date = as.Date(rownames(delt_data))
@@ -61,17 +59,11 @@ ChartBook <- function (SYMBOLS) {
   theme_set(theme_bw(base_size = 5))
   # Error in read.table(file = file, header = header, sep = sep, quote = quote,  :no lines available in input
   # create list of xts objects by applying getSymbols on each ticker
-  xts_objects <- lapply(SYMBOLS, function(SYMBOL) {
-    suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
-  })
-  names(xts_objects) <- SYMBOLS
-
-  lapply(xts_objects, function(xts_object) {
-    # ticker symbol, etc. GLD, is names of xts object
-    symbol <- names(xts_object)
+  lapply(SYMBOLS, function(SYMBOL) {
+    xts_object <- suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
     data_frame <- data.frame(Cl(xts_object))
     # param for summary_data is ticker
-    summary_data <- Summary(symbol)
+    summary_data <- Summary(SYMBOL)
     summary_table <- tableGrob(summary_data,
                                theme = k_theme,
                                rows = c("Percent Change", "Absolute Change")
@@ -110,7 +102,7 @@ ChartBook <- function (SYMBOLS) {
 
     # Export to pdf, file="/path/to/chart/book/directory"
     pdf(file = output_path, onefile = FALSE, paper = "letter", width = 0, height = 0,
-        title = format(symbol))
+        title = format(SYMBOL))
     # suppress warnings of rows missing values
     # with summary: arrangeGrob(summary, one_mo_plot, heights=c(0.5,2))
     suppressWarnings(grid.arrange(arrangeGrob(summary_table, one_mo_plot, heights=c(0.5, 2)),
