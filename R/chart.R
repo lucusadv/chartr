@@ -17,28 +17,21 @@ Summary <- function(SYMBOL, max=ten_yr) {
   data_frame <- data.frame(Cl(xts_object))
 
   h <- hash()
-  h$day <- list(percent=percent(tail(delt_data[,1], 1)),
-                price=GetPriceChange(data_frame, Sys.Date(), one_day))
-  h$wtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(Eopw('Fri'))], na.rm = TRUE)),
-                price=GetPriceChange(data_frame, Sys.Date(), Eopw('Fri')))
-  h$week <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_wk)], na.rm = TRUE)),
-                 price=GetPriceChange(data_frame, Sys.Date(), one_wk))
-  h$mtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= Eopm(Sys.Date())], na.rm = TRUE)),
-                price=GetPriceChange(data_frame, Sys.Date(), Eopm(Sys.Date())))
-  h$month <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_mo)], na.rm = TRUE)),
-                  price=GetPriceChange(data_frame, Sys.Date(), one_mo))
-  h$qtr <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(three_mo)], na.rm = TRUE)),
-                price=GetPriceChange(data_frame, Sys.Date(), three_mo))
-  h$year <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_yr)], na.rm = TRUE)),
-                 price=GetPriceChange(data_frame, Sys.Date(), one_yr))
+  h$day <- list(percent=percent(tail(delt_data[,1], 1)))
+  h$wtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(Eopw('Fri'))], na.rm = TRUE)))
+  h$week <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_wk)], na.rm = TRUE)))
+  h$mtd <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= Eopm(Sys.Date())], na.rm = TRUE)))
+  h$month <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_mo)], na.rm = TRUE)))
+  h$qtr <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(three_mo)], na.rm = TRUE)))
+  h$year <- list(percent=percent(mean(delt_data$Delt.1.arithmetic[delt_data$date >= as.character(one_yr)], na.rm = TRUE)))
   summary_data <- data.frame(
-    DAY=c(h[["day"]]$percent, h[["day"]]$price),
-    WTD=c(h[["wtd"]]$percent, h[["wtd"]]$price),
-    WEEK=c(h[["week"]]$percent, h[["week"]]$price),
-    MTD=c(h[["mtd"]]$percent, h[["mtd"]]$price),
-    MONTH=c(h[["month"]]$percent, h[["month"]]$price),
-    QTR=c(h[["qtr"]]$percent, h[["qtr"]]$price),
-    YEAR=c(h[["year"]]$percent, h[["year"]]$price)
+    DAY=c(h[["day"]]$percent),
+    WTD=c(h[["wtd"]]$percent),
+    WEEK=c(h[["week"]]$percent),
+    MTD=c(h[["mtd"]]$percent),
+    MONTH=c(h[["month"]]$percent),
+    QTR=c(h[["qtr"]]$percent),
+    YEAR=c(h[["year"]]$percent)
   )
   return (summary_data)
 }
@@ -56,17 +49,22 @@ ChartBook <- function (SYMBOLS) {
     colhead = list(fg_params=list(cex = 0.4)),
     rowhead = list(fg_params=list(cex = 0.4))
   )
+  # set font size
   theme_set(theme_bw(base_size = 5))
-  # Error in read.table(file = file, header = header, sep = sep, quote = quote,  :no lines available in input
-  # create list of xts objects by applying getSymbols on each ticker
+
+  # Export to pdf, file="/path/to/chart/book/directory"
+  pdf(file = output_path, onefile = TRUE, paper = "letter", width = 0, height = 0,
+      title = format(label))
+
   lapply(SYMBOLS, function(SYMBOL) {
     xts_object <- suppressWarnings(quantmod::getSymbols(SYMBOL, method="curl", auto.assign=FALSE))
     data_frame <- data.frame(Cl(xts_object))
-    # param for summary_data is ticker
+    data_frame$date = as.Date(rownames(data_frame))
+    colnames(data_frame)[1] = "price"
     summary_data <- Summary(SYMBOL)
     summary_table <- tableGrob(summary_data,
                                theme = k_theme,
-                               rows = c("Percent Change", "Absolute Change")
+                               rows = c(paste(SYMBOL, "Price Change"))
     )
     one_mo_plot <- ggplot() +
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("1-Month") +
@@ -100,12 +98,9 @@ ChartBook <- function (SYMBOLS) {
       geom_line(data=data_frame, aes(x=date, y=price)) + xlab("All Time") +
       scale_x_date(date_labels = "%Y", date_breaks = "5 years")
 
-    # Export to pdf, file="/path/to/chart/book/directory"
-    pdf(file = output_path, onefile = FALSE, paper = "letter", width = 0, height = 0,
-        title = format(SYMBOL))
     # suppress warnings of rows missing values
     # with summary: arrangeGrob(summary, one_mo_plot, heights=c(0.5,2))
-    suppressWarnings(grid.arrange(arrangeGrob(summary_table, one_mo_plot, heights=c(0.5, 2)),
+    plot(suppressWarnings(grid.arrange(arrangeGrob(summary_table, one_mo_plot, heights=c(0.5, 2)),
                                   arrangeGrob(three_mo_plot, heights=c(2)),
                                   arrangeGrob(six_mo_plot, heights=c(2)),
                                   arrangeGrob(one_yr_plot, heights=c(2)),
@@ -113,7 +108,7 @@ ChartBook <- function (SYMBOLS) {
                                   arrangeGrob(five_yr_plot, heights=c(2)),
                                   arrangeGrob(ten_yr_plot, heights=c(2)),
                                   arrangeGrob(all_plot, heights=c(2)),
-                                  nrow=4, ncol=2))
-    dev.off()
+                                  nrow=4, ncol=2)))
   })
+  dev.off()
 }
