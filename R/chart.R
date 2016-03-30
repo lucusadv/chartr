@@ -42,7 +42,7 @@ Summary <- function(SYMBOL, max=ten_yr) {
 #'@return null: generates pdf
 #'@export
 #'
-ChartBook <- function (SYMBOLS) {
+ChartBook <- function (SYMBOLS, show=NULL) {
   # Default theme for all tableGrobs
   k_theme <- gridExtra::ttheme_default(
     core = list(fg_params=list(cex = 0.4)),
@@ -66,41 +66,33 @@ ChartBook <- function (SYMBOLS) {
                                theme = k_theme,
                                rows = c(paste(SYMBOL, "Price Change"))
     )
-    one_mo_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("1-Month") +
+    one_mo_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("1-Month") +
       scale_y_continuous(limits = c(GetMin(data_frame, one_mo), GetMax(data_frame, one_mo))) +
       scale_x_date(limits = c(one_mo, NA), date_labels = "%b %d", date_breaks = "1 week")
-    three_mo_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("3-Month") +
+    three_mo_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("3-Month") +
       scale_y_continuous(limits = c(GetMin(data_frame, three_mo), GetMax(data_frame, three_mo))) +
       scale_x_date(limits = c(three_mo, NA), date_labels = "%b %d", date_breaks = "3 weeks")
-    six_mo_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("6-Month") +
+    six_mo_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("6-Month") +
       scale_y_continuous(limits = c(GetMin(data_frame, six_mo), GetMax(data_frame, six_mo))) +
       scale_x_date(limits = c(six_mo, NA), date_labels = "%b", date_breaks = "1 month")
-    one_yr_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("12-Month") +
+    one_yr_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("12-Month") +
       scale_y_continuous(limits = c(GetMin(data_frame, one_yr), GetMax(data_frame, one_yr))) +
       scale_x_date(limits = c(one_yr, NA), date_labels = "%b", date_breaks = "2 months")
-    three_yr_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("3-Year") +
+    three_yr_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("3-Year") +
       scale_y_continuous(limits = c(GetMin(data_frame, three_yr), GetMax(data_frame, three_yr))) +
       scale_x_date(limits = c(three_yr, NA), date_labels = "%b %Y", date_breaks = "1 year")
-    five_yr_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("5-Year") +
+    five_yr_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("5-Year") +
       scale_y_continuous(limits = c(GetMin(data_frame, five_yr), GetMax(data_frame, five_yr))) +
       scale_x_date(limits = c(five_yr, NA), date_labels = "%Y", date_breaks = "1 year")
-    ten_yr_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("10-Year") +
+    ten_yr_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("10-Year") +
       scale_y_continuous(limits = c(GetMin(data_frame, ten_yr), GetMax(data_frame, ten_yr))) +
       scale_x_date(limits = c(ten_yr, NA), date_labels = "%Y", date_breaks = "2 years")
-    all_plot <- ggplot() +
-      geom_line(data=data_frame, aes(x=date, y=price)) + xlab("All Time") +
-      scale_x_date(date_labels = "%Y", date_breaks = "5 years")
+    all_plot <- ggplot() + geom_line(data=data_frame, aes(x=date, y=price)) + xlab("All Time") +
+      scale_x_date(date_labels = "%Y", date_breaks = "2 years")
 
     # suppress warnings of rows missing values
     # with summary: arrangeGrob(summary, one_mo_plot, heights=c(0.5,2))
-    plot(suppressWarnings(grid.arrange(arrangeGrob(summary_table, one_mo_plot, heights=c(0.5, 2)),
+    suppressWarnings(grid.arrange(arrangeGrob(summary_table, one_mo_plot, heights=c(0.5, 2)),
                                   arrangeGrob(three_mo_plot, heights=c(2)),
                                   arrangeGrob(six_mo_plot, heights=c(2)),
                                   arrangeGrob(one_yr_plot, heights=c(2)),
@@ -108,7 +100,7 @@ ChartBook <- function (SYMBOLS) {
                                   arrangeGrob(five_yr_plot, heights=c(2)),
                                   arrangeGrob(ten_yr_plot, heights=c(2)),
                                   arrangeGrob(all_plot, heights=c(2)),
-                                  nrow=4, ncol=2)))
+                                  nrow=4, ncol=2))
   })
   dev.off()
 }

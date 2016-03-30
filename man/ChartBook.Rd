@@ -4,7 +4,7 @@
 \alias{ChartBook}
 \title{Generates paginated chart books of performance over time}
 \usage{
-ChartBook(SYMBOLS)
+ChartBook(SYMBOLS, show = NULL)
 }
 \arguments{
 \item{SYMBOLS:}{list of strings of ticker names}
